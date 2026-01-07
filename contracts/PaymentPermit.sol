@@ -15,7 +15,7 @@ contract PaymentPermit is IPaymentPermit, EIP712 {
 
     mapping(address => mapping(uint256 => uint256)) public override nonceBitmap;
 
-    constructor() EIP712("PaymentPermit", "1") {}
+    constructor() EIP712() {}
 
     function permitTransferFrom(
         PaymentPermitDetails calldata permit, 

@@ -21,7 +21,7 @@ library PermitHash {
         "PaymentPermitWithCallback(PaymentPermitDetails permit,CallbackDetails callback)CallbackDetails(address callbackTarget,bytes callbackData)Delivery(address receiveToken,uint256 miniReceiveAmount,uint256 tokenId)Fee(address feeTo,uint256 feeAmount)Payment(address payToken,uint256 maxPayAmount,address payTo)PaymentPermitDetails(PermitMeta meta,address caller,Payment payment,Fee fee,Delivery delivery)PermitMeta(uint8 kind,bytes16 paymentId,uint256 nonce,uint256 validAfter,uint256 validBefore)"
     );
 
-    function hash(IPaymentPermit.PaymentPermitDetails calldata permit) internal pure returns (bytes32) {
+    function hash(IPaymentPermit.PaymentPermitDetails memory permit) internal pure returns (bytes32) {
         return keccak256(abi.encode(
             PAYMENT_PERMIT_DETAILS_TYPEHASH,
             hash(permit.meta),
@@ -32,7 +32,7 @@ library PermitHash {
         ));
     }
 
-    function hash(IPaymentPermit.CallbackDetails calldata callback) internal pure returns (bytes32) {
+    function hash(IPaymentPermit.CallbackDetails memory callback) internal pure returns (bytes32) {
         return keccak256(abi.encode(
             CALLBACK_DETAILS_TYPEHASH,
             callback.callbackTarget,
@@ -40,7 +40,7 @@ library PermitHash {
         ));
     }
 
-    function hash(IPaymentPermit.PermitMeta calldata meta) internal pure returns (bytes32) {
+    function hash(IPaymentPermit.PermitMeta memory meta) internal pure returns (bytes32) {
         return keccak256(abi.encode(
             PERMIT_META_TYPEHASH,
             meta.kind,
@@ -51,7 +51,7 @@ library PermitHash {
         ));
     }
 
-    function hash(IPaymentPermit.Payment calldata payment) internal pure returns (bytes32) {
+    function hash(IPaymentPermit.Payment memory payment) internal pure returns (bytes32) {
         return keccak256(abi.encode(
             PAYMENT_TYPEHASH,
             payment.payToken,
@@ -60,7 +60,7 @@ library PermitHash {
         ));
     }
 
-    function hash(IPaymentPermit.Fee calldata fee) internal pure returns (bytes32) {
+    function hash(IPaymentPermit.Fee memory fee) internal pure returns (bytes32) {
         return keccak256(abi.encode(
             FEE_TYPEHASH,
             fee.feeTo,
@@ -68,7 +68,7 @@ library PermitHash {
         ));
     }
 
-    function hash(IPaymentPermit.Delivery calldata delivery) internal pure returns (bytes32) {
+    function hash(IPaymentPermit.Delivery memory delivery) internal pure returns (bytes32) {
         return keccak256(abi.encode(
             DELIVERY_TYPEHASH,
             delivery.receiveToken,

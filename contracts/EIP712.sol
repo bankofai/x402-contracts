@@ -2,49 +2,40 @@
 pragma solidity ^0.8.20;
 
 import {IEIP712} from "./interface/IEIP712.sol";
-import {IPaymentPermit} from "./interface/IPaymentPermit.sol";
 
-abstract contract EIP712 is IEIP712 {
-    /*//////////////////////////////////////////////////////////////////////////
-                                      CONSTANTS
-    //////////////////////////////////////////////////////////////////////////*/
+/// @notice EIP712 helpers for permit2
+/// @dev Maintains cross-chain replay protection in the event of a fork
+/// @dev Reference: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/EIP712.sol
+contract EIP712 is IEIP712 {
+    // Cache the domain separator as an immutable value, but also store the chain id that it
+    // corresponds to, in order to invalidate the cached domain separator if the chain id changes.
+    bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;
+    uint256 private immutable _CACHED_CHAIN_ID;
 
-    /// @dev The EIP-712 domain typeHash.
-    // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
-    bytes32 internal constant _DOMAIN_TYPEHASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
+    bytes32 private constant _HASHED_NAME = keccak256("PaymentPermit");
+    bytes32 private constant _TYPE_HASH =
+        keccak256("EIP712Domain(string name,uint256 chainId,address verifyingContract)");
 
-    /*//////////////////////////////////////////////////////////////////////////
-                                   IMMUTABLES
-    //////////////////////////////////////////////////////////////////////////*/
-
-    bytes32 internal immutable _DOMAIN_SEPARATOR;
-
-    function DOMAIN_SEPARATOR() public view virtual override returns (bytes32) {
-        return _DOMAIN_SEPARATOR;
+    constructor() {
+        _CACHED_CHAIN_ID = block.chainid;
+        _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_TYPE_HASH, _HASHED_NAME);
     }
 
-    /*//////////////////////////////////////////////////////////////////////////
-                                  CONSTRUCTOR
-    //////////////////////////////////////////////////////////////////////////*/
-
-    constructor(string memory name, string memory version) {
-        _DOMAIN_SEPARATOR = keccak256(
-            abi.encode(
-                _DOMAIN_TYPEHASH,
-                keccak256(bytes(name)),
-                keccak256(bytes(version)),
-                block.chainid,
-                address(this)
-            )
-        );
+    /// @notice Returns the domain separator for the current chain.
+    /// @dev Uses cached version if chainid and address are unchanged from construction.
+    function DOMAIN_SEPARATOR() public view override returns (bytes32) {
+        return block.chainid == _CACHED_CHAIN_ID
+            ? _CACHED_DOMAIN_SEPARATOR
+            : _buildDomainSeparator(_TYPE_HASH, _HASHED_NAME);
     }
 
-    /*//////////////////////////////////////////////////////////////////////////
-                                 INTERNAL FUNCTIONS
-    //////////////////////////////////////////////////////////////////////////*/
+    /// @notice Builds a domain separator using the current chainId and contract address.
+    function _buildDomainSeparator(bytes32 typeHash, bytes32 nameHash) private view returns (bytes32) {
+        return keccak256(abi.encode(typeHash, nameHash, block.chainid, address(this)));
+    }
 
-    /// @dev Returns the digest to sign.
-    function _hashTypedData(bytes32 structHash) internal view virtual returns (bytes32 digest) {
-        return keccak256(abi.encodePacked("\x19\x01", _DOMAIN_SEPARATOR, structHash));
+    /// @notice Creates an EIP-712 typed data hash
+    function _hashTypedData(bytes32 dataHash) internal view returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), dataHash));
     }
 }

@@ -253,14 +253,7 @@ contract PaymentPermitTest is Test {
         bytes32 digest = keccak256(abi.encodePacked(
             "\x19\x01",
             DOMAIN_SEPARATOR,
-            keccak256(abi.encode(
-                PAYMENT_PERMIT_DETAILS_TYPEHASH,
-                keccak256(abi.encode(PERMIT_META_TYPEHASH, permit.meta.kind, permit.meta.paymentId, permit.meta.nonce, permit.meta.validAfter, permit.meta.validBefore)),
-                permit.caller,
-                keccak256(abi.encode(PAYMENT_TYPEHASH, permit.payment.payToken, permit.payment.maxPayAmount, permit.payment.payTo)),
-                keccak256(abi.encode(FEE_TYPEHASH, permit.fee.feeTo, permit.fee.feeAmount)),
-                keccak256(abi.encode(DELIVERY_TYPEHASH, permit.delivery.receiveToken, permit.delivery.miniReceiveAmount, permit.delivery.tokenId))
-            ))
+            permit.hash()
         ));
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPrivateKey, digest);
@@ -268,28 +261,13 @@ contract PaymentPermitTest is Test {
     }
 
     function _signPermitWithCallback(IPaymentPermit.PaymentPermitDetails memory permit, IPaymentPermit.CallbackDetails memory callback) internal view returns (bytes memory) {
-        bytes32 permitHash = keccak256(abi.encode(
-            PAYMENT_PERMIT_DETAILS_TYPEHASH,
-            keccak256(abi.encode(PERMIT_META_TYPEHASH, permit.meta.kind, permit.meta.paymentId, permit.meta.nonce, permit.meta.validAfter, permit.meta.validBefore)),
-            permit.caller,
-            keccak256(abi.encode(PAYMENT_TYPEHASH, permit.payment.payToken, permit.payment.maxPayAmount, permit.payment.payTo)),
-            keccak256(abi.encode(FEE_TYPEHASH, permit.fee.feeTo, permit.fee.feeAmount)),
-            keccak256(abi.encode(DELIVERY_TYPEHASH, permit.delivery.receiveToken, permit.delivery.miniReceiveAmount, permit.delivery.tokenId))
-        ));
-
-        bytes32 callbackHash = keccak256(abi.encode(
-            CALLBACK_DETAILS_TYPEHASH,
-            callback.callbackTarget,
-            keccak256(callback.callbackData)
-        ));
-
         bytes32 digest = keccak256(abi.encodePacked(
             "\x19\x01",
             DOMAIN_SEPARATOR,
             keccak256(abi.encode(
                 PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH,
-                permitHash,
-                callbackHash
+                permit.hash(),
+                callback.hash()
             ))
         ));
 
