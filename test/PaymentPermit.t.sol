@@ -6,6 +6,7 @@ import "../contracts/PaymentPermit.sol";
 import "./MockERC20.sol";
 import "../contracts/interface/IPaymentPermit.sol";
 import "../contracts/interface/IAgentExecInterface.sol";
+import "../contracts/libraries/PermitHash.sol";
 
 contract MockAgent is IAgentExecInterface {
     event Executed(bytes data);
@@ -19,6 +20,9 @@ contract MockAgent is IAgentExecInterface {
 }
 
 contract PaymentPermitTest is Test {
+    using PermitHash for IPaymentPermit.PaymentPermitDetails;
+    using PermitHash for IPaymentPermit.CallbackDetails;
+
     PaymentPermit public paymentPermit;
     MockERC20 public token;
 
@@ -30,20 +34,14 @@ contract PaymentPermitTest is Test {
 
     bytes32 internal DOMAIN_SEPARATOR;
 
-    // TypeHashes copied from contract for testing
-    bytes32 public constant PERMIT_META_TYPEHASH = keccak256("PermitMeta(uint8 kind,bytes16 paymentId,uint256 nonce,uint256 validAfter,uint256 validBefore)");
-    bytes32 public constant PAYMENT_TYPEHASH = keccak256("Payment(address payToken,uint256 maxPayAmount,address payTo)");
-    bytes32 public constant FEE_TYPEHASH = keccak256("Fee(address feeTo,uint256 feeAmount)");
-    bytes32 public constant DELIVERY_TYPEHASH = keccak256("Delivery(address receiveToken,uint256 miniReceiveAmount,uint256 tokenId)");
-    bytes32 public constant PAYMENT_PERMIT_DETAILS_TYPEHASH = keccak256(
-        "PaymentPermitDetails(PermitMeta meta,address caller,Payment payment,Fee fee,Delivery delivery)Delivery(address receiveToken,uint256 miniReceiveAmount,uint256 tokenId)Fee(address feeTo,uint256 feeAmount)Payment(address payToken,uint256 maxPayAmount,address payTo)PermitMeta(uint8 kind,bytes16 paymentId,uint256 nonce,uint256 validAfter,uint256 validBefore)"
-    );
-
-    bytes32 public constant CALLBACK_DETAILS_TYPEHASH = keccak256("CallbackDetails(address callbackTarget,bytes callbackData)");
-
-    bytes32 public constant PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH = keccak256(
-        "PaymentPermitWithCallback(PaymentPermitDetails permit,CallbackDetails callback)CallbackDetails(address callbackTarget,bytes callbackData)Delivery(address receiveToken,uint256 miniReceiveAmount,uint256 tokenId)Fee(address feeTo,uint256 feeAmount)Payment(address payToken,uint256 maxPayAmount,address payTo)PaymentPermitDetails(PermitMeta meta,address caller,Payment payment,Fee fee,Delivery delivery)PermitMeta(uint8 kind,bytes16 paymentId,uint256 nonce,uint256 validAfter,uint256 validBefore)"
-    );
+    // TypeHashes from library
+    bytes32 public constant PERMIT_META_TYPEHASH = PermitHash.PERMIT_META_TYPEHASH;
+    bytes32 public constant PAYMENT_TYPEHASH = PermitHash.PAYMENT_TYPEHASH;
+    bytes32 public constant FEE_TYPEHASH = PermitHash.FEE_TYPEHASH;
+    bytes32 public constant DELIVERY_TYPEHASH = PermitHash.DELIVERY_TYPEHASH;
+    bytes32 public constant PAYMENT_PERMIT_DETAILS_TYPEHASH = PermitHash.PAYMENT_PERMIT_DETAILS_TYPEHASH;
+    bytes32 public constant CALLBACK_DETAILS_TYPEHASH = PermitHash.CALLBACK_DETAILS_TYPEHASH;
+    bytes32 public constant PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH = PermitHash.PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH;
 
     function setUp() public {
         ownerPrivateKey = 0xA11CE;

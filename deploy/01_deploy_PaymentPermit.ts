@@ -6,11 +6,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy('x402', {
+  await deploy('PaymentPermit', {
     from: deployer,
-    args: ['Hello Tron!'],
+    args: [],
     log: true,
   });
 };
 export default func;
-func.tags = ['x402'];
+func.tags = ['PaymentPermit'];

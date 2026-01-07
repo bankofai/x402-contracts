@@ -6,9 +6,12 @@ import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 import {EIP712} from "./EIP712.sol";
 import {IAgentExecInterface} from "./interface/IAgentExecInterface.sol";
+import {PermitHash} from "./libraries/PermitHash.sol";
 
 contract PaymentPermit is IPaymentPermit, EIP712 {
     using SafeTransferLib for ERC20;
+    using PermitHash for IPaymentPermit.PaymentPermitDetails;
+    using PermitHash for IPaymentPermit.CallbackDetails;
 
     mapping(address => mapping(uint256 => uint256)) public override nonceBitmap;
 
@@ -27,7 +30,7 @@ contract PaymentPermit is IPaymentPermit, EIP712 {
 
         _useNonce(owner, permit.meta.nonce);
 
-        bytes32 digest = _buildDigest(permit);
+        bytes32 digest = _hashTypedData(permit.hash());
         if (!_verifySignature(owner, digest, signature)) revert InvalidSignature();
 
         // Execute transfers
@@ -56,7 +59,11 @@ contract PaymentPermit is IPaymentPermit, EIP712 {
         
         _useNonce(owner, permit.meta.nonce);
 
-        bytes32 digest = _buildDigestWithCallback(permit, callbackDetails);
+        bytes32 digest = _hashTypedData(keccak256(abi.encode(
+            PermitHash.PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH,
+            permit.hash(),
+            callbackDetails.hash()
+        )));
         if (!_verifySignature(owner, digest, signature)) revert InvalidSignature();
 
         // Execute transfers
