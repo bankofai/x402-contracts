@@ -41,7 +41,6 @@ contract PaymentPermitTest is Test {
     bytes32 public constant DELIVERY_TYPEHASH = PermitHash.DELIVERY_TYPEHASH;
     bytes32 public constant PAYMENT_PERMIT_DETAILS_TYPEHASH = PermitHash.PAYMENT_PERMIT_DETAILS_TYPEHASH;
     bytes32 public constant CALLBACK_DETAILS_TYPEHASH = PermitHash.CALLBACK_DETAILS_TYPEHASH;
-    bytes32 public constant PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH = PermitHash.PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH;
 
     function setUp() public {
         ownerPrivateKey = 0xA11CE;
@@ -231,6 +230,7 @@ contract PaymentPermitTest is Test {
                 validAfter: 0,
                 validBefore: block.timestamp + 1000
             }),
+            buyer: owner,
             caller: address(0),
             payment: IPaymentPermit.Payment({
                 payToken: address(token),
@@ -260,15 +260,11 @@ contract PaymentPermitTest is Test {
         return abi.encodePacked(r, s, v);
     }
 
-    function _signPermitWithCallback(IPaymentPermit.PaymentPermitDetails memory permit, IPaymentPermit.CallbackDetails memory callback) internal view returns (bytes memory) {
+    function _signPermitWithCallback(IPaymentPermit.PaymentPermitDetails memory permit, IPaymentPermit.CallbackDetails memory /*callback*/) internal view returns (bytes memory) {
         bytes32 digest = keccak256(abi.encodePacked(
             "\x19\x01",
             DOMAIN_SEPARATOR,
-            keccak256(abi.encode(
-                PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH,
-                permit.hash(),
-                callback.hash()
-            ))
+            permit.hash()
         ));
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPrivateKey, digest);

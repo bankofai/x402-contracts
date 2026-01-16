@@ -3,13 +3,12 @@ pragma solidity ^0.8.20;
 
 import {IPaymentPermit} from "./interface/IPaymentPermit.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
-import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
+import {SafeTransferLib} from "sun-contract-std/libraries/SafeTransferLib.sol";
 import {EIP712} from "./EIP712.sol";
 import {IAgentExecInterface} from "./interface/IAgentExecInterface.sol";
 import {PermitHash} from "./libraries/PermitHash.sol";
 
 contract PaymentPermit is IPaymentPermit, EIP712 {
-    using SafeTransferLib for ERC20;
     using PermitHash for IPaymentPermit.PaymentPermitDetails;
     using PermitHash for IPaymentPermit.CallbackDetails;
 
@@ -36,11 +35,11 @@ contract PaymentPermit is IPaymentPermit, EIP712 {
 
         // Execute transfers
         // 1. Payment
-        ERC20(permit.payment.payToken).safeTransferFrom(owner, permit.payment.payTo, transferDetails.amount);
+        require(SafeTransferLib.safeTransferFrom(permit.payment.payToken, owner, permit.payment.payTo, transferDetails.amount), "Payment failed");
 
         // 2. Fee
         if (permit.fee.feeAmount > 0) {
-            ERC20(permit.payment.payToken).safeTransferFrom(owner, permit.fee.feeTo, permit.fee.feeAmount);
+            require(SafeTransferLib.safeTransferFrom(permit.payment.payToken, owner, permit.fee.feeTo, permit.fee.feeAmount), "Fee failed");
         }
 
         emit PermitTransfer(owner, permit.meta.paymentId, transferDetails.amount);
@@ -61,20 +60,16 @@ contract PaymentPermit is IPaymentPermit, EIP712 {
         
         _useNonce(owner, permit.meta.nonce);
 
-        bytes32 digest = _hashTypedData(keccak256(abi.encode(
-            PermitHash.PAYMENT_PERMIT_WITH_CALLBACK_TYPEHASH,
-            permit.hash(),
-            callbackDetails.hash()
-        )));
+        bytes32 digest = _hashTypedData(permit.hash());
         if (!_verifySignature(owner, digest, signature)) revert InvalidSignature();
 
         // Execute transfers
         // 1. Payment
-        ERC20(permit.payment.payToken).safeTransferFrom(owner, permit.payment.payTo, transferDetails.amount);
+        require(SafeTransferLib.safeTransferFrom(permit.payment.payToken, owner, permit.payment.payTo, transferDetails.amount), "Payment failed");
 
         // 2. Fee
         if (permit.fee.feeAmount > 0) {
-            ERC20(permit.payment.payToken).safeTransferFrom(owner, permit.fee.feeTo, permit.fee.feeAmount);
+            require(SafeTransferLib.safeTransferFrom(permit.payment.payToken, owner, permit.fee.feeTo, permit.fee.feeAmount), "Fee failed");
         }
 
         // 3. Callback
