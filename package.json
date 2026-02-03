@@ -19,6 +19,8 @@
     "audit": "hardhat audit",
     "vscode-audit": "hardhat audit --format json",
     "deploy": "hardhat deploy --network tron",
+    "deploy-nile": "hardhat deploy --network nile",
+    "deploy-shasta": "hardhat deploy --network shasta",
     "postinstall": "sh scripts/postinstall.sh && echo 'Post-installation script executed successfully.'"
   }
 }

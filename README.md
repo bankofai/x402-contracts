@@ -3,7 +3,7 @@
 [![Solidity](https://img.shields.io/badge/Solidity-^0.8.20-blue)](https://soliditylang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Smart contracts for the **x402** payment protocol on **TRON**. Enables gasless, signature-based (EIP-712) payment authorizations and TRON-native settlement (including USDT).
+Smart contracts for the **x402** payment protocol on **TRON**. Enables gasless, signature-based (EIP-712) payment authorizations and TRON-native token settlement.
 
 ---
 
@@ -21,7 +21,7 @@ Smart contracts for the **x402** payment protocol on **TRON**. Enables gasless, 
 
 - **EIP-712 typed permits** — Users sign payment details off-chain; a relayer or backend calls `permitTransferFrom` with the signature.
 - **Gasless for the signer** — The submitter pays gas; the signer only needs a one-time `approve` of the PaymentPermit contract (that approve costs Energy/TRX on first use).
-- **TRON USDT-safe** — Uses [sun-contract-std](https://github.com/sun-protocol/sun-contract-std) `SafeTransferLib` for tokens that do not return a boolean (e.g. TRON USDT).
+- **TRC20 via SafeTransferLib** — Uses [sun-contract-std](https://github.com/sun-protocol/sun-contract-std) `SafeTransferLib` for TRC20 transfers (handles tokens that do not return a boolean).
 - **Optional fee** — Permit can include `feeTo` and `feeAmount` for protocol or facilitator fees.
 - **Replay protection** — Nonce bitmap per owner; time window via `validAfter` / `validBefore`.
 
@@ -46,7 +46,7 @@ Flow: **User signs** `PaymentPermitDetails` (payment, fee, validity, nonce) → 
 |-----------|---------------------|------------------------|
 | **TRON Mainnet** | Mainnet              | _TBD_                  |
 | **Nile**         | Testnet              | `TCR6EaRtLRYjWPr7YWHqt4uL81rfevtE8p` |
-| **Shasta**       | Testnet              | _TBD_                  |
+| **Shasta**       | Testnet              | `TFiMDs3KeDiwcB5rRBqFHYaNHFZGxEJ89U` |
 
 - **Mainnet**: Production; use after audit and deployment.
 - **Nile**: Primary testnet for integration and staging.
@@ -69,8 +69,6 @@ Flow: **User signs** `PaymentPermitDetails` (payment, fee, validity, nonce) → 
 
 ```bash
 pnpm install
-# or
-npm install
 ```
 
 Post-install runs `scripts/postinstall.sh` (e.g. submodules or tooling). Ensure it completes successfully.
@@ -78,7 +76,7 @@ Post-install runs `scripts/postinstall.sh` (e.g. submodules or tooling). Ensure 
 ### Build
 
 ```bash
-npx hardhat compile
+pnpm run compile
 # or
 forge build
 ```
@@ -86,7 +84,7 @@ forge build
 ### Test
 
 ```bash
-npx hardhat test
+pnpm run test
 # or
 forge test -vvv
 ```
@@ -104,7 +102,7 @@ forge test -vvv
 2. Deploy:
 
    ```bash
-   npx hardhat deploy --network tron
+   pnpm run deploy --tags PaymentPermit
    ```
 
 Deploy scripts live in `deploy/` (e.g. `01_deploy_PaymentPermit.ts`). Configure `hardhat.config.ts` for mainnet/nile/shasta as needed.
@@ -139,7 +137,7 @@ Deploy scripts live in `deploy/` (e.g. `01_deploy_PaymentPermit.ts`). Configure 
 2. **ChainId for signing** — When building EIP-712 typed data, use the chainId of the target network so the signature matches the contract: **Mainnet** `0x2b67540c`, **Nile** `0xcd8690dc`, **Shasta** `0x94a9059e`. Wallet/TronLink must use the same chainId.
 3. **Sign off-chain** — Build `PaymentPermitDetails` (meta, buyer, caller, payment, fee, delivery), hash with `PermitHash` and domain separator, then sign (e.g. 65-byte `r || s || v`).
 4. **Submit on-chain** — Call `permitTransferFrom(permit, transferDetails, owner, signature)`. The `owner` must have approved the PaymentPermit contract for the `payToken` (and have sufficient balance for `amount` plus optional `feeAmount`).
-5. **TRON USDT** — The contract uses `SafeTransferLib` for TRC20; non-returning tokens (e.g. TRON USDT) are handled by the library.
+5. **TRC20** — The contract uses `SafeTransferLib` for TRC20 transfers; tokens that do not return a boolean are handled by the library.
 
 For full struct and field definitions, see `contracts/interface/IPaymentPermit.sol`.
 
