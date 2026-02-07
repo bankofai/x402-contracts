@@ -10,11 +10,10 @@ interface IPaymentPermit is IEIP712 {
         address caller;
         Payment payment;
         Fee fee;
-        Delivery delivery;
     }
 
     struct PermitMeta {
-        uint8 kind; // 0: PAYMENT_ONLY, 1: PAYMENT_AND_DELIVERY
+        uint8 kind; // 0: PAYMENT_ONLY
         bytes16 paymentId;
         uint256 nonce;
         uint256 validAfter;
@@ -32,12 +31,6 @@ interface IPaymentPermit is IEIP712 {
         uint256 feeAmount;
     }
 
-    struct Delivery {
-        address receiveToken;
-        uint256 miniReceiveAmount;
-        uint256 tokenId;
-    }
-
     // Events
     event PermitTransfer(
         address indexed buyer,
@@ -53,7 +46,6 @@ interface IPaymentPermit is IEIP712 {
     error InvalidNonce();
     error InvalidSignature();
     error NonceAlreadyUsed();
-    error InvalidDelivery();
     error InvalidKind();
     error BuyerMismatch();
 

@@ -25,7 +25,6 @@ contract PaymentPermitTest is Test {
         PermitHash.PERMIT_META_TYPEHASH;
     bytes32 public constant PAYMENT_TYPEHASH = PermitHash.PAYMENT_TYPEHASH;
     bytes32 public constant FEE_TYPEHASH = PermitHash.FEE_TYPEHASH;
-    bytes32 public constant DELIVERY_TYPEHASH = PermitHash.DELIVERY_TYPEHASH;
     bytes32 public constant PAYMENT_PERMIT_DETAILS_TYPEHASH =
         PermitHash.PAYMENT_PERMIT_DETAILS_TYPEHASH;
 
@@ -261,12 +260,7 @@ contract PaymentPermitTest is Test {
                     payAmount: amount,
                     payTo: receiver
                 }),
-                fee: IPaymentPermit.Fee({feeTo: feeReceiver, feeAmount: fee}),
-                delivery: IPaymentPermit.Delivery({
-                    receiveToken: address(0),
-                    miniReceiveAmount: 0,
-                    tokenId: 0
-                })
+                fee: IPaymentPermit.Fee({feeTo: feeReceiver, feeAmount: fee})
             });
     }
 

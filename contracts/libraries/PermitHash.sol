@@ -12,15 +12,11 @@ library PermitHash {
         keccak256("Payment(address payToken,uint256 payAmount,address payTo)");
     bytes32 public constant FEE_TYPEHASH =
         keccak256("Fee(address feeTo,uint256 feeAmount)");
-    bytes32 public constant DELIVERY_TYPEHASH =
-        keccak256(
-            "Delivery(address receiveToken,uint256 miniReceiveAmount,uint256 tokenId)"
-        );
 
-    // Sort referenced structs alphabetically: Delivery, Fee, Payment, PermitMeta
+    // Sort referenced structs alphabetically: Fee, Payment, PermitMeta
     bytes32 public constant PAYMENT_PERMIT_DETAILS_TYPEHASH =
         keccak256(
-            "PaymentPermitDetails(PermitMeta meta,address buyer,address caller,Payment payment,Fee fee,Delivery delivery)Delivery(address receiveToken,uint256 miniReceiveAmount,uint256 tokenId)Fee(address feeTo,uint256 feeAmount)Payment(address payToken,uint256 payAmount,address payTo)PermitMeta(uint8 kind,bytes16 paymentId,uint256 nonce,uint256 validAfter,uint256 validBefore)"
+            "PaymentPermitDetails(PermitMeta meta,address buyer,address caller,Payment payment,Fee fee)Fee(address feeTo,uint256 feeAmount)Payment(address payToken,uint256 payAmount,address payTo)PermitMeta(uint8 kind,bytes16 paymentId,uint256 nonce,uint256 validAfter,uint256 validBefore)"
         );
 
     function hash(
@@ -34,8 +30,7 @@ library PermitHash {
                     permit.buyer,
                     permit.caller,
                     hash(permit.payment),
-                    hash(permit.fee),
-                    hash(permit.delivery)
+                    hash(permit.fee)
                 )
             );
     }
@@ -74,19 +69,5 @@ library PermitHash {
         IPaymentPermit.Fee memory fee
     ) internal pure returns (bytes32) {
         return keccak256(abi.encode(FEE_TYPEHASH, fee.feeTo, fee.feeAmount));
-    }
-
-    function hash(
-        IPaymentPermit.Delivery memory delivery
-    ) internal pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    DELIVERY_TYPEHASH,
-                    delivery.receiveToken,
-                    delivery.miniReceiveAmount,
-                    delivery.tokenId
-                )
-            );
     }
 }
