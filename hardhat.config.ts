@@ -30,7 +30,7 @@ const config: HardhatUserConfig = {
     tron: {
       url: process.env.TRON_RPC_URL || 'https://api.trongrid.io/jsonrpc', // tron rpc url
       tron: true, // enable tron network
-      deploy: ['deploy/'], // folder for tron deploy scripts
+      deploy: ['deployTron/'], // folder for tron deploy scripts
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [], // account private key for deploy
     },
     nile: {
