@@ -45,12 +45,14 @@ Flow: **User signs** `PaymentPermitDetails` (payment, fee, validity, nonce) → 
 | Network   | Chain / Environment | PaymentPermit Address |
 |-----------|---------------------|------------------------|
 | **TRON Mainnet** | Mainnet              | [`TT8rEWbCoNX7vpEUauxb7rWJsTgs8vDLAn`](https://tronscan.org/#/contract/TT8rEWbCoNX7vpEUauxb7rWJsTgs8vDLAn) |
-| **Nile** | Testnet              | [`TFxDcGvS7zfQrS1YzcCMp673ta2NHHzsiH`](https://nile.tronscan.org/#/contract/TFxDcGvS7zfQrS1YzcCMp673ta2NHHzsiH) |
-| **Shasta** | Testnet              | [`TR2XninQ3jsvRRLGTifFyUHTBysffooUjt`](https://shasta.tronscan.org/#/contract/TR2XninQ3jsvRRLGTifFyUHTBysffooUjt) |
+| **TRON Nile** | Testnet              | [`TFxDcGvS7zfQrS1YzcCMp673ta2NHHzsiH`](https://nile.tronscan.org/#/contract/TFxDcGvS7zfQrS1YzcCMp673ta2NHHzsiH) |
+| **TRON Shasta** | Testnet              | [`TR2XninQ3jsvRRLGTifFyUHTBysffooUjt`](https://shasta.tronscan.org/#/contract/TR2XninQ3jsvRRLGTifFyUHTBysffooUjt) |
 
-- **Mainnet**: Production; use after audit and deployment.
-- **Nile**: Primary testnet for integration and staging.
-- **Shasta**: Alternate testnet.
+| Network   | Chain / Environment | PaymentPermit Address |
+|-----------|---------------------|------------------------|
+| **BSC Mainnet** | Mainnet              | [`0x1825bB32db3443dEc2cc7508b2D818fc13EaD878`](https://bscscan.com/address/0x1825bB32db3443dEc2cc7508b2D818fc13EaD878) |
+| **BSC Testnet** | Testnet              | [`0x1825bB32db3443dEc2cc7508b2D818fc13EaD878`](https://testnet.bscscan.com/address/0x1825bB32db3443dEc2cc7508b2D818fc13EaD878) |
+
 
 ---
 
