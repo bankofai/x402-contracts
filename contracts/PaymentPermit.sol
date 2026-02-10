@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {IPaymentPermit} from "./interface/IPaymentPermit.sol";
-import {SafeTransferLib} from "sun-contract-std/libraries/SafeTransferLib.sol";
+import {SafeTransferLib,ERC20} from "solmate/utils/SafeTransferLib.sol";
 import {EIP712} from "./EIP712.sol";
 import {PermitHash} from "./libraries/PermitHash.sol";
 
@@ -34,26 +34,21 @@ contract PaymentPermit is IPaymentPermit, EIP712 {
 
         // Execute transfers
         // 1. Payment
-        require(
-            SafeTransferLib.safeTransferFrom(
-                permit.payment.payToken,
-                owner,
-                permit.payment.payTo,
-                permit.payment.payAmount
-            ),
-            "Payment failed"
+        
+        SafeTransferLib.safeTransferFrom(
+            ERC20(permit.payment.payToken),
+            owner,
+            permit.payment.payTo,
+            permit.payment.payAmount
         );
 
         // 2. Fee
         if (permit.fee.feeAmount > 0) {
-            require(
-                SafeTransferLib.safeTransferFrom(
-                    permit.payment.payToken,
-                    owner,
-                    permit.fee.feeTo,
-                    permit.fee.feeAmount
-                ),
-                "Fee failed"
+            SafeTransferLib.safeTransferFrom(
+                ERC20(permit.payment.payToken),
+                owner,
+                permit.fee.feeTo,
+                permit.fee.feeAmount
             );
         }
 
